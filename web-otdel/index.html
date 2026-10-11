@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Анкета для веб-отдела</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&family=Onest:wght@400;500&family=Oranienbaum&display=swap">
+<style>
+  /* Раскладка. Одна колонка как бланк: сверху шпаргалка для Никиты, ниже разделы вопросов в порядке созвона. Счётчик ответов липнет сверху */
+  :root {
+    --paper: #ffffff; --plate: #f3f2ef; --line: #e4e3df; --ink: #111111; --ink-soft: #3a3a3a; --mute: #6a6a6a;
+    --chip: #d6d5d0; --plum: #4b2981; --plum-bg: #efeaf8; --ok: #1f7a4d;
+    --display: "Oranienbaum", Georgia, "Times New Roman", serif;
+    --sans: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #121211; --plate: #1c1c1a; --line: #2e2e2b; --ink: #efeee9; --ink-soft: #cfcdc6; --mute: #9a988f; --chip: #3a3a36; --plum: #b9a2e6; --plum-bg: #251d36; --ok: #6cc497; color-scheme: dark; }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 72px; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 820px; margin: 0 auto; padding-inline: 24px; padding-block: 48px 96px; display: grid; gap: 56px; }
+  @media (max-width: 640px) { .wrap { padding-inline: 16px; padding-block: 28px 72px; gap: 44px; } }
+  h1, h2, h3 { font-family: var(--display); font-weight: 400; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(44px, 7vw, 76px); line-height: 0.95; }
+  h2 { font-size: clamp(30px, 4vw, 40px); line-height: 1.05; }
+  h3 { font-size: 24px; line-height: 1.1; }
+  p { margin: 0; }
+  .eyebrow, .count, .save, .why b { font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.02em; font-weight: 400; }
+  .eyebrow { color: var(--mute); }
+  .lead { font-size: clamp(18px, 2.2vw, 20px); color: var(--ink-soft); max-width: 62ch; }
+  header { display: grid; gap: 18px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .meta span { font-size: 14px; color: var(--ink-soft); background: var(--plate); border-radius: 999px; padding: 6px 12px; }
+  label.field { display: grid; gap: 6px; font-size: 15px; color: var(--ink-soft); max-width: 420px; }
+  input[type="text"], textarea { width: 100%; font: 400 16px/1.45 var(--sans); color: var(--ink); background: var(--paper); border: 1px solid var(--chip); border-radius: 10px; padding: 10px 12px; }
+  textarea { min-height: 80px; resize: vertical; }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--ink); }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--plum); outline-offset: 2px; }
+
+  /* Шпаргалка */
+  .guide { background: var(--plate); border-radius: 14px; padding: 28px; display: grid; gap: 28px; }
+  @media (max-width: 640px) { .guide { padding: 20px; } }
+  .guide > p.lead { font-size: 17px; }
+  .parts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 640px) { .parts { grid-template-columns: minmax(0, 1fr); } }
+  .part { background: var(--paper); border-radius: 10px; padding: 16px; display: grid; gap: 4px; align-content: start; }
+  .part b { font-weight: 500; }
+  .part p { color: var(--ink-soft); font-size: 15.5px; }
+  ol.steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: s; }
+  ol.steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; counter-increment: s; }
+  ol.steps li::before { content: counter(s); font-family: var(--mono); font-size: 13px; color: var(--plum); background: var(--plum-bg); border-radius: 999px; width: 26px; height: 26px; display: grid; place-items: center; }
+  .need { color: var(--ink-soft); font-size: 15.5px; }
+  details.qa { border-top: 1px solid var(--line); }
+  details.qa summary { list-style: none; cursor: pointer; padding: 12px 0; font-weight: 500; display: flex; justify-content: space-between; gap: 16px; }
+  details.qa summary::-webkit-details-marker { display: none; }
+  details.qa summary::after { content: "+"; font-family: var(--mono); color: var(--mute); }
+  details.qa[open] summary::after { content: "−"; }
+  details.qa p { color: var(--ink-soft); font-size: 15.5px; padding-bottom: 14px; max-width: 62ch; }
+
+  /* Сводка */
+  .summary { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--paper); border-bottom: 1px solid var(--line); padding: 12px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+  .summary .count { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .summary a { color: var(--ink); font-size: 14px; font-weight: 500; text-decoration: none; }
+  .track { flex: 1 1 200px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .track i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .25s ease; }
+  .save { color: var(--mute); }
+
+  /* Вопросы */
+  section.sec { display: grid; gap: 4px; scroll-margin-top: 80px; }
+  .sec-head { display: grid; gap: 6px; margin-bottom: 18px; }
+  .sec-head .who { color: var(--ink-soft); }
+  .q { display: grid; gap: 10px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .q-title { font-weight: 500; }
+  .q-title .n { font-family: var(--mono); font-size: 13px; color: var(--mute); font-weight: 400; margin-right: 8px; font-variant-numeric: tabular-nums; }
+  .hint { color: var(--ink-soft); font-size: 15px; }
+  .why { color: var(--ink-soft); font-size: 15px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: baseline; max-width: 64ch; }
+  .why b { color: var(--plum); background: var(--plum-bg); padding: 2px 8px; border-radius: 999px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font: 400 15px/1.3 var(--sans); padding: 8px 14px; border: 1px solid var(--chip); border-radius: 999px; background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; }
+  .chip:hover { border-color: var(--ink); }
+  .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .q.done .q-title .n { color: var(--ok); }
+  .extra textarea { min-height: 120px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font: 500 15px/1 var(--sans); padding: 12px 18px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; }
+  .btn.ghost { background: var(--paper); color: var(--ink); }
+  .btn.quiet { border-color: transparent; background: none; color: var(--mute); font-weight: 400; padding-inline: 8px; }
+  #summary-text { min-height: 260px; font-family: var(--mono); font-size: 13px; background: var(--plate); border-color: var(--line); }
+  footer { color: var(--mute); font-size: 15px; border-top: 1px solid var(--line); padding-top: 20px; }
+  @media (prefers-reduced-motion: reduce) { .track i { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Искусство для здоровья · созвон с веб-отделом института</p>
+    <h1>Анкета для веб-отдела</h1>
+    <p class="lead">Всё, что нужно от института, чтобы выложить сайт курса и подключить оплату, почту и видео. Заполняем на созвоне вместе. У каждого вопроса одной строкой, зачем он нужен.</p>
+    <div class="meta"><span>Около 30 минут</span><span>Ответы сохраняются в этом браузере</span><span>В конце скопируйте ответы и пришлите разработчику</span></div>
+    <label class="field">Кто заполняет<input type="text" id="who" placeholder="Например, Никита и Алексей из веб-отдела" autocomplete="off"></label>
+  </header>
+
+  <section class="guide" aria-labelledby="guide-title">
+    <div style="display:grid;gap:10px">
+      <p class="eyebrow">Шпаргалка для Никиты, прочитать до созвона</p>
+      <h2 id="guide-title">Как всё устроено</h2>
+    </div>
+    <p class="lead">Сайт, личный кабинет и админка уже сделаны и проверены. От института нужно место, где они будут работать, и доступы к сервисам, через которые идут оплата, письма и видео.</p>
+
+    <div class="parts">
+      <div class="part"><b>Сервер</b><p>Арендованный компьютер в дата-центре, на нём круглосуточно работает сайт. Для нас это VPS на Beget в России.</p></div>
+      <div class="part"><b>Сайт, кабинет и админка</b><p>Одно приложение. Показывает страницы, ведёт кабинеты участников, админку координатора и оплату.</p></div>
+      <div class="part"><b>База данных</b><p>PostgreSQL на том же сервере. Там участники, заказы, доступы, прогресс и ответы на задания. Каждую ночь делается копия.</p></div>
+      <div class="part"><b>Файлы</b><p>Ответы участников с вложениями и материалы модулей лежат в папке на сервере. Видео там нет, оно в Kinescope.</p></div>
+      <div class="part"><b>Домен и DNS</b><p>Домен это адрес сайта. DNS подсказывает браузеру, на каком сервере этот адрес искать.</p></div>
+      <div class="part"><b>Внешние сервисы</b><p>Робокасса, почта, Kinescope, Битрикс24 и Метрика. Сайт обращается к ним по ключам, ключи хранятся в настройках на сервере.</p></div>
+    </div>
+
+    <div style="display:grid;gap:14px">
+      <h3>Как работает оплата через Робокассу</h3>
+      <ol class="steps">
+        <li><span>Участник нажимает «Купить модуль», сайт создаёт заказ с номером и суммой.</span></li>
+        <li><span>Сайт переводит его на страницу оплаты Робокассы. Это отдельная страница Робокассы, а не окно внутри сайта, данные карты сайт не видит.</span></li>
+        <li><span>Участник платит картой или по СБП.</span></li>
+        <li><span>Робокасса сообщает сайту, что деньги пришли. Сообщение подписано секретным паролем магазина, подделать его нельзя.</span></li>
+        <li><span>Сайт открывает модуль, пишет участнику письмо и отправляет оплату в Битрикс24. Чек участнику присылает Робокасса.</span></li>
+      </ol>
+      <p class="need">Код уже готов, вставлять ничего не нужно. От института нужны договор с Робокассой, магазин для курса, логин магазина и пароли, налоговые данные для чека. Подключение идёт в три шага. Сначала тестовый режим, где деньги не списываются. Потом Робокасса проверяет сайт, документы и реквизиты. После одобрения включаем настоящие оплаты.</p>
+    </div>
+
+    <div style="display:grid;gap:6px">
+      <h3>Если спросят на созвоне</h3>
+      <details class="qa"><summary>На чём сделан сайт?</summary><p>Next.js 16 на Node.js 24, база PostgreSQL 16, админка на Payload CMS. Перед сайтом веб-сервер nginx с сертификатом https от Let’s Encrypt, он продлевается сам.</p></details>
+      <details class="qa"><summary>Какой нужен сервер?</summary><p>Ubuntu 24.04, 2 ядра, 4 ГБ памяти, 40 ГБ диска, размещение в России. Снаружи открыты только порты 22 для SSH, 80 и 443 для сайта. Обычный хостинг для сайтов без Node.js не подойдёт.</p></details>
+      <details class="qa"><summary>Почему не Тильда или обычный хостинг?</summary><p>Нужны личные кабинеты, оплата, база участников, тесты, задания и админка для координатора. Конструкторы этого не умеют, а для такого приложения нужен свой сервер.</p></details>
+      <details class="qa"><summary>Где хранятся данные участников?</summary><p>В базе на сервере института в России, как требует закон о персональных данных. Пароли хранятся только в виде хеша, данные банковских карт сайт не получает вовсе.</p></details>
+      <details class="qa"><summary>Как защищён сервер?</summary><p>Вход только по ключу, без паролей и без root. Обновления безопасности ставятся сами каждую ночь, подбор пароля к серверу блокируется. Сайт работает под отдельным пользователем без прав администратора, везде https и ограничения частоты запросов к входу и формам.</p></details>
+      <details class="qa"><summary>Кто и как обновляет сайт?</summary><p>Разработчик одной командой на сервере. Новая версия собирается рядом со старой, и если что-то не так, сайт остаётся на прежней. Вернуть предыдущую версию можно одной командой за минуту.</p></details>
+      <details class="qa"><summary>А резервные копии?</summary><p>Каждую ночь копия базы и файлов, хранятся 14 дней. Вторую копию лучше держать вне сервера, например в резервных копиях Beget. Об этом есть вопрос в анкете.</p></details>
+      <details class="qa"><summary>Как узнаем, что сайт упал?</summary><p>Внешний сторож проверяет сайт каждые пять минут. Кроме того, сайт сам присылает письмо, если упал или начал отвечать ошибками.</p></details>
+      <details class="qa"><summary>Сколько посетителей выдержит?</summary><p>Страницы курса отдаются сотнями в секунду, кабинет десятками. Для запуска с рассылкой этого хватает с большим запасом, замер есть в инструкции.</p></details>
+      <details class="qa"><summary>Где код и есть ли документация?</summary><p>Код в закрытом репозитории на GitHub. Есть пошаговая инструкция по серверу, выкладке, откату и резервным копиям, её можно передать веб-отделу.</p></details>
+      <details class="qa"><summary>Можно поставить на наш сервер?</summary><p>Да, если на нём Ubuntu, можно поставить Node.js 24 и PostgreSQL и есть 4 ГБ памяти. Инструкция та же.</p></details>
+    </div>
+  </section>
+
+  <div class="summary" aria-label="Сколько ответов">
+    <span class="count" id="count">0 из 0</span>
+    <span class="track"><i id="bar"></i></span>
+    <a href="#send">К отправке</a>
+  </div>
+
+  <div id="form"></div>
+
+  <section class="sec extra" aria-labelledby="extra-title">
+    <div class="sec-head"><p class="eyebrow">Напоследок</p><h2 id="extra-title">Что ещё важно</h2></div>
+    <textarea id="extra" placeholder="Всё, что не вошло в вопросы. Договорённости, сроки, контакты"></textarea>
+  </section>
+
+  <section class="sec" id="send" aria-labelledby="send-title">
+    <div class="sec-head"><p class="eyebrow">После созвона</p><h2 id="send-title">Пришлите ответы разработчику</h2>
+      <p class="lead">Скопируйте текст и вставьте в чат или скачайте файл. Ответы хранятся только в этом браузере, пока вы их не очистите.</p></div>
+    <textarea id="summary-text" readonly aria-label="Ответы текстом"></textarea>
+    <div class="btns">
+      <button class="btn" type="button" id="copy">Скопировать ответы</button>
+      <button class="btn ghost" type="button" id="download">Скачать файл</button>
+      <button class="btn quiet" type="button" id="reset">Очистить ответы</button>
+      <span class="save" id="send-state" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <footer>Ответы сохраняются в этом браузере сразу после выбора. Повторное нажатие снимает вариант. Ключи и пароли сюда не вписываем, их вносят прямо на сервере.</footer>
+</div>
+
+<script>
+(() => {
+  // Вопросы по разделам в порядке созвона. Номера вопросов постоянные: по ним хранятся ответы
+  const S = [
+    { id: "server", title: "Домен и сервер", who: "Для веб-отдела", qs: [
+      { id: "domain", t: "На каком адресе будет сайт курса?", type: "single", opts: ["Отдельный домен, уже есть", "Отдельный домен, нужно купить", "Поддомен сайта института, например art.idm.institute", "Не решили"], text: "Адрес",
+        why: "На этом адресе работают сайт, письма и вход в кабинет. По нему Робокасса проверяет магазин. Без адреса сайт нельзя выложить." },
+      { id: "dns", t: "Кто управляет DNS домена и внесёт записи?", type: "single", opts: ["Веб-отдел", "Доступ к регистратору даст институт", "Никита"], text: "Контакт",
+        why: "Две записи ведут домен на наш сервер. Ещё три нужны почте, чтобы письма сайта не попадали в спам." },
+      { id: "host", t: "Где будет работать сайт?", type: "single", opts: ["Новый VPS на Beget на аккаунт института", "Свой сервер института", "Другой хостинг"], text: "Где именно",
+        why: "Сайт, кабинет и база работают одним приложением на Node.js, обычный хостинг для сайтов не подойдёт. Сервер в России, так требует закон о персональных данных." },
+      { id: "spec", t: "Подходит такой сервер?", hint: "Ubuntu 24.04, 2 ядра, 4 ГБ памяти, 40 ГБ диска, Москва или Петербург, файл подкачки 4 ГБ", type: "single", opts: ["Да", "Нужно согласовать", "Есть свои требования"], text: "Требования",
+        why: "Этого хватает с запасом, замер показал сотни посетителей одновременно. Меньше 4 ГБ памяти не хватит для выкладки новых версий." },
+      { id: "owner", t: "На кого оформлен сервер и кто его оплачивает?", type: "single", opts: ["Институт", "Никита, институт компенсирует", "Обсудим"],
+        why: "Сервер и данные участников принадлежат институту. Доступы должны остаться у него и после запуска." },
+      { id: "ssh", t: "Как разработчик получит доступ к серверу?", type: "single", opts: ["Веб-отдел создаст пользователя и добавит ключ разработчика", "Доступ к панели Beget", "Нужно согласовать"],
+        why: "Доступ по SSH нужен, чтобы установить сайт и выкладывать обновления. Пароль не нужен, только ключ, его можно отозвать в любой момент." },
+      { id: "security", t: "Есть ли у института требования к безопасности?", type: "multi", opts: ["Только серверы института", "Доступ через VPN", "Согласование со службой безопасности", "Особых требований нет"], text: "Подробности",
+        why: "Чтобы учесть их сразу, а не переделывать перед запуском." },
+      { id: "backup", t: "Где хранить вторую резервную копию?", type: "single", opts: ["Резервные копии Beget", "Хранилище института", "Пока только на сервере"],
+        why: "Каждую ночь сайт сохраняет базу и файлы участников на том же сервере. Копия в другом месте спасёт данные, если сервер сломается." },
+      { id: "support", t: "Кто следит за сервером после запуска?", type: "single", opts: ["Веб-отдел", "Никита и разработчик", "Вместе"], text: "Почта для писем о сбоях",
+        why: "Если сайт упадёт или начнёт отвечать ошибками, на эту почту сразу придёт письмо." },
+    ] },
+    { id: "mail", title: "Почта", who: "Для веб-отдела", qs: [
+      { id: "mail_from", t: "С какого адреса сайт пишет участникам?", type: "single", opts: ["hello@idm.institute", "Отдельный адрес на домене сайта", "Другой"], text: "Адрес",
+        why: "Подтверждение регистрации, сброс пароля, оплата, напоминания о вебинарах. Участники видят этот адрес как отправителя." },
+      { id: "smtp", t: "Через какой почтовый сервис отправлять письма?", type: "single", opts: ["Корпоративная почта института, например Яндекс 360", "Сервис рассылок, например Unisender Go", "Посоветуйте"], text: "Сервис",
+        why: "Сервер сам письма надёжно не доставит, они уходят через почтовый сервис по SMTP. Нужны адрес сервиса, порт, логин и пароль, их вносят прямо на сервере." },
+      { id: "spf", t: "Кто внесёт записи SPF, DKIM и DMARC для почты?", type: "single", opts: ["Веб-отдел", "Разработчик, если дадут доступ к DNS", "Обсудим"],
+        why: "Без этих записей письма сайта чаще попадают в спам. Это главный риск в день запуска." },
+      { id: "staff_mail", t: "На какую почту приходят вопросы участников и ответы на задания?", type: "text", text: "Почта координатора",
+        why: "Сайт сразу пишет координатору о новом вопросе под уроком, о присланном задании и о заявке партнёра." },
+    ] },
+    { id: "pay", title: "Оплата", who: "Для бухгалтерии или ответственного за Робокассу", qs: [
+      { id: "rk_contract", t: "Есть ли у института договор с Робокассой?", type: "single", opts: ["Есть, магазин для курса создан", "Договор есть, магазина для курса нет", "Договора нет", "Не знаю"],
+        why: "Деньги приходят на счёт института, магазин открывается на институт. Проверку магазина Робокассой нужно пройти до 20 октября." },
+      { id: "rk_who", t: "Кто создаст магазин и внесёт его настройки?", type: "single", opts: ["Бухгалтерия", "Веб-отдел", "Никита с доступом к кабинету Робокассы"], text: "Контакт",
+        why: "Нужны логин магазина и четыре пароля, два для тестов и два для настоящих оплат. Пароли вносят на сервере, в чат их не пересылаем." },
+      { id: "rk_receipt", t: "Кто отправляет чек за оплату?", type: "single", opts: ["Робочеки, облачная касса Робокассы", "Своя онлайн-касса института", "Не знаю"],
+        why: "По закону о кассах на каждую оплату нужен чек. Сайт уже передаёт для него название модуля и сумму." },
+      { id: "rk_tax", t: "Какие налоговые данные указывать в чеке?", type: "single", opts: ["Образовательные услуги без НДС", "С НДС", "Спросим бухгалтера"], text: "Система налогообложения",
+        why: "Система налогообложения и ставка НДС есть в каждом чеке. Образование по лицензии обычно идёт без НДС, но точно скажет бухгалтер." },
+      { id: "rk_test", t: "Кто пройдёт тестовую оплату вместе с нами?", type: "text", text: "Имя и почта",
+        why: "В тестовом режиме платить могут только сотрудники и названные почты. Деньги не списываются, а модуль открывается." },
+    ] },
+    { id: "video", title: "Видео", who: "Для того, кто загружает видео", qs: [
+      { id: "kinescope", t: "Есть ли у института аккаунт в Kinescope?", type: "single", opts: ["Есть", "Нет, заведём", "Другой видеохостинг"], text: "Какой",
+        why: "Видео курса хранится не на сервере, а в Kinescope. В админке в шаг модуля вставляется номер видео, участник смотрит его в кабинете." },
+      { id: "kinescope_domain", t: "Кто включит показ видео только на сайте курса?", type: "single", opts: ["Веб-отдел", "Тот, кто загружает видео", "Никита с доступом"],
+        why: "В настройках Kinescope добавляется домен сайта. Тогда ссылку на видео нельзя переслать тем, кто не платил." },
+      { id: "live", t: "Вебинары проводим трансляцией в Kinescope?", type: "single", opts: ["Да", "Нет, другая площадка", "Не знаем"], text: "Площадка",
+        why: "Сайт показывает эфир Kinescope прямо на странице модуля, а после эфира его запись." },
+      { id: "intro", t: "Есть ли видео бесплатной вводной лекции?", type: "single", opts: ["Есть", "Будет позже", "Без вводной лекции"], text: "Ссылка",
+        why: "На странице курса для неё уже есть место и кнопка на главной." },
+      { id: "module1", t: "Когда будут видео и материалы первого модуля?", type: "single", opts: ["Уже готовы", "До 25 октября", "К 1 ноября"],
+        why: "Модуль 01 открывается 1 ноября в полночь, к этому времени шаги с видео должны быть в админке." },
+    ] },
+    { id: "crm", title: "CRM, аналитика и заявки", who: "Для веб-отдела", qs: [
+      { id: "bitrix", t: "Подключаем Битрикс24?", type: "single", opts: ["Да, веб-отдел создаст вебхук", "Да, дадут доступ к порталу", "Пока без Битрикс24"], text: "Адрес портала",
+        why: "Регистрации, оплаты и возвраты сами попадают в CRM контактами, лидами и сделками. Для этого нужен входящий вебхук с правами на CRM." },
+      { id: "bitrix_stages", t: "В какие стадии сделки ставить оплату и возврат?", type: "text", text: "Стадии",
+        why: "Чтобы оплаченная сделка сразу вставала на своё место в воронке. Если не скажут, ставим «Успешно» и «Провал»." },
+      { id: "partners", t: "Куда ещё отправлять заявки от фармкомпаний и бизнеса?", hint: "Сейчас они приходят в админку сайта и письмом координатору", type: "multi", opts: ["Лидом в Битрикс24", "На отдельную почту", "Достаточно админки и письма"], text: "Почта для заявок",
+        why: "Форма для партнёров на главной уже работает. Можно дополнительно ставить заявки в CRM или слать на почту отдела продаж." },
+      { id: "metrika", t: "Счётчик Яндекс Метрики", type: "single", opts: ["Есть счётчик, дадим доступ", "Заведём новый", "Без Метрики"], text: "Номер счётчика",
+        why: "Показывает, сколько людей пришло, откуда и сколько дошло до оплаты. Метрика включается только после согласия посетителя." },
+    ] },
+    { id: "docs", title: "Документы и данные", who: "Для юриста и Дарьи", qs: [
+      { id: "legal", t: "Когда будут оферта, политика и согласие на обработку данных?", type: "single", opts: ["Уже готовы", "До 15 октября", "До 20 октября", "Не знаем"],
+        why: "Без этих документов на сайте Робокасса не примет магазин. Тексты загружаются в админку одной командой." },
+      { id: "requisites", t: "Верны ли реквизиты в подвале сайта?", hint: "ИНН 7718276336, ОГРН 1157700015417, лицензия № 040112", type: "single", opts: ["Верно", "Есть правки"], text: "Правки",
+        why: "Робокасса сверяет реквизиты продавца с выпиской ЕГРЮЛ и лицензией." },
+      { id: "rkn", t: "Есть ли у института уведомление в Роскомнадзор об обработке персональных данных?", type: "single", opts: ["Есть", "Нет", "Не знаю"],
+        why: "Сайт собирает ФИО, почту, телефон и место работы участников. Оператор этих данных институт." },
+      { id: "staff", t: "Кто будет администратором и координатором в админке?", type: "text", text: "Имена и почты",
+        why: "Им создаём учётные записи. Для входа лучше почта, которая не опубликована на сайте." },
+    ] },
+    { id: "plan", title: "Кто и когда", who: "Договориться в конце созвона", qs: [
+      { id: "it_contact", t: "Кто в веб-отделе отвечает за сайт курса?", type: "text", text: "Имя и контакт",
+        why: "Чтобы знать, к кому идти с доступами, DNS и вопросами после запуска." },
+      { id: "ready", t: "Когда будут готовы сервер, домен и доступы?", type: "single", opts: ["В ближайшие два дня", "До 15 октября", "До 20 октября"],
+        why: "Сайт нужно выложить за несколько дней до проверки Робокассой 20 октября. Сама выкладка по готовой инструкции занимает около часа." },
+      { id: "handover", t: "Передать веб-отделу инструкцию по серверу?", type: "single", opts: ["Да", "Нет, пусть ведёт разработчик"],
+        why: "В ней установка, выкладка новых версий, откат и резервные копии. Пригодится, если веб-отдел будет следить за сервером сам." },
+    ] },
+  ];
+
+  const KEY = "ah-web-brief-v1";
+  const ALL = S.flatMap((s) => s.qs);
+  let st = { who: "", extra: "", a: {} }; // a: id -> { v: строка или массив, t: строка }
+  try { const raw = localStorage.getItem(KEY); if (raw) st = { ...st, ...JSON.parse(raw) }; } catch (e) {}
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const formEl = $("#form");
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const answered = (id) => { const a = st.a[id]; if (!a) return false; const v = Array.isArray(a.v) ? a.v.length > 0 : Boolean(a.v); return v || Boolean(a.t && a.t.trim()); };
+
+  function build() {
+    let n = 0;
+    S.forEach((s, si) => {
+      const sec = el("section", "sec");
+      sec.id = s.id;
+      sec.setAttribute("aria-labelledby", "h-" + s.id);
+      const head = el("div", "sec-head");
+      const h = el("h2", null, s.title);
+      h.id = "h-" + s.id;
+      head.append(el("p", "eyebrow", "Раздел " + (si + 1) + " из " + S.length), h, el("p", "who", s.who));
+      sec.append(head);
+      for (const q of s.qs) {
+        n++;
+        const box = el("div", "q");
+        box.dataset.id = q.id;
+        const title = el("p", "q-title");
+        title.append(el("span", "n", String(n).padStart(2, "0")), document.createTextNode(q.t));
+        box.append(title);
+        if (q.hint) box.append(el("p", "hint", q.hint));
+        const why = el("p", "why");
+        why.append(el("b", null, "зачем"), el("span", null, q.why));
+        box.append(why);
+        if (q.opts) {
+          const chips = el("div", "chips");
+          chips.setAttribute("role", "group");
+          chips.setAttribute("aria-label", q.t);
+          for (const o of q.opts) {
+            const b = el("button", "chip", o);
+            b.type = "button";
+            b.dataset.v = o;
+            b.setAttribute("aria-pressed", "false");
+            chips.append(b);
+          }
+          box.append(chips);
+        }
+        if (q.text) {
+          const f = el("label", "field");
+          f.append(document.createTextNode(q.text));
+          const input = el("input");
+          input.type = "text";
+          input.id = "t-" + q.id;
+          input.autocomplete = "off";
+          f.append(input);
+          box.append(f);
+        }
+        sec.append(box);
+      }
+      formEl.append(sec);
+    });
+  }
+
+  function paint() {
+    let done = 0;
+    for (const q of ALL) {
+      const box = formEl.querySelector('.q[data-id="' + q.id + '"]');
+      const a = st.a[q.id] || {};
+      const vals = Array.isArray(a.v) ? a.v : a.v ? [a.v] : [];
+      for (const b of box.querySelectorAll(".chip")) b.setAttribute("aria-pressed", String(vals.includes(b.dataset.v)));
+      const input = box.querySelector("input");
+      if (input && document.activeElement !== input) input.value = a.t || "";
+      const ok = answered(q.id);
+      box.classList.toggle("done", ok);
+      if (ok) done++;
+    }
+    if (document.activeElement !== $("#who")) $("#who").value = st.who;
+    if (document.activeElement !== $("#extra")) $("#extra").value = st.extra;
+    $("#count").textContent = "Отвечено " + done + " из " + ALL.length;
+    $("#bar").style.width = (done / ALL.length) * 100 + "%";
+    $("#summary-text").value = summary();
+  }
+
+  function summary() {
+    const lines = ["Анкета для веб-отдела", st.who ? "Заполняли " + st.who : "", ""];
+    let n = 0;
+    for (const s of S) {
+      lines.push(s.title);
+      for (const q of s.qs) {
+        n++;
+        const a = st.a[q.id] || {};
+        const v = Array.isArray(a.v) ? a.v.join(", ") : a.v || "";
+        const t = (a.t || "").trim();
+        lines.push(String(n).padStart(2, "0") + ". " + q.t);
+        lines.push("    " + ([v, t].filter(Boolean).join(". ") || "нет ответа"));
+      }
+      lines.push("");
+    }
+    if (st.extra.trim()) lines.push("Что ещё важно", st.extra.trim());
+    return lines.filter((l, i, arr) => !(l === "" && arr[i - 1] === "")).join("\n");
+  }
+
+  formEl.addEventListener("click", (e) => {
+    const b = e.target.closest(".chip");
+    if (!b) return;
+    const id = b.closest(".q").dataset.id;
+    const q = ALL.find((x) => x.id === id);
+    const a = Object.assign({ v: null, t: "" }, st.a[id] || {});
+    if (q.type === "multi") {
+      const cur = Array.isArray(a.v) ? a.v : [];
+      a.v = cur.includes(b.dataset.v) ? cur.filter((x) => x !== b.dataset.v) : cur.concat(b.dataset.v);
+    } else {
+      a.v = a.v === b.dataset.v ? null : b.dataset.v;
+    }
+    st.a[id] = a;
+    persist();
+    paint();
+  });
+  formEl.addEventListener("input", (e) => {
+    const input = e.target.closest("input");
+    if (!input) return;
+    const id = input.closest(".q").dataset.id;
+    st.a[id] = Object.assign({ v: null, t: "" }, st.a[id] || {}, { t: input.value.slice(0, 1000) });
+    persist();
+    paint();
+  });
+  $("#who").addEventListener("input", (e) => { st.who = e.target.value.slice(0, 200); persist(); paint(); });
+  $("#extra").addEventListener("input", (e) => { st.extra = e.target.value.slice(0, 4000); persist(); paint(); });
+
+  const sendState = $("#send-state");
+  const say = (text) => { sendState.textContent = text; setTimeout(() => (sendState.textContent = ""), 3000); };
+  $("#copy").addEventListener("click", async () => {
+    const ta = $("#summary-text");
+    try { await navigator.clipboard.writeText(ta.value); say("Ответы скопированы"); }
+    catch (e) { ta.removeAttribute("readonly"); ta.select(); try { document.execCommand("copy"); say("Ответы скопированы"); } catch (_) { say("Текст выделен, скопируйте его"); } ta.setAttribute("readonly", ""); }
+  });
+  $("#download").addEventListener("click", () => {
+    const blob = new Blob([summary()], { type: "text/plain;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Анкета для веб-отдела, ответы.txt";
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    say("Файл скачан");
+  });
+  // Очистка в два нажатия, чтобы не стереть ответы случайно
+  let armed = false;
+  $("#reset").addEventListener("click", () => {
+    if (!armed) { armed = true; $("#reset").textContent = "Точно очистить? Нажмите ещё раз"; setTimeout(() => { armed = false; $("#reset").textContent = "Очистить ответы"; }, 4000); return; }
+    st = { who: "", extra: "", a: {} };
+    persist();
+    armed = false;
+    $("#reset").textContent = "Очистить ответы";
+    paint();
+    say("Ответы очищены");
+  });
+
+  build();
+  paint();
+})();
+</script>
+</body>
+</html>
